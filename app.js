@@ -14,7 +14,8 @@ app.use(cookieParser());
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://freelancer-frontend-6mlt.vercel.app'
+    'https://freelancer-frontend-6mlt.vercel.app',
+    'https://freelancer-frontend-6mlt-git-main-nithishs-projects-15d4b63a.vercel.app'
   ],
   credentials: true
 }));
