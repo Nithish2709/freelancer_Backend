@@ -12,27 +12,45 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-const corsOptions = {
+const allowedOrigins = [
+  'http://localhost:5173',
+];
+
+app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
 
-    if (
-      origin === 'http://localhost:5173' ||
-      origin.endsWith('.vercel.app')
-    ) {
-      return callback(null, true);
+    // allow localhost
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, origin);
+    }
+
+    // allow ALL vercel preview + production URLs
+    if (origin.includes('.vercel.app')) {
+      return callback(null, origin); // 🔥 IMPORTANT: return origin
     }
 
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
-};
+}));
 
-// apply CORS to all routes
-app.use(cors(corsOptions));
+// 🔥 handle preflight properly
+app.options('*', cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
 
-// 👇 THIS LINE IS CRITICAL (handles preflight)
-app.options('*', cors(corsOptions));
+    if (
+      origin === 'http://localhost:5173' ||
+      origin.includes('.vercel.app')
+    ) {
+      return callback(null, origin);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+}));
 
 
 
