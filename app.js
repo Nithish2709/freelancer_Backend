@@ -12,13 +12,24 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://freelancer-frontend-6mlt.vercel.app',
-    'https://freelancer-frontend-6mlt-git-main-nithishs-projects-15d4b63a.vercel.app'
-  ],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+
+    // allow localhost
+    if (origin === 'http://localhost:5173') {
+      return callback(null, true);
+    }
+
+    // allow all vercel domains
+    if (origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
+
 
 
 app.get('/', (req, res) => res.send('Freelancing App API is running...'));
