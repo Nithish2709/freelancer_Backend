@@ -11,24 +11,28 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
+
+const corsOptions = {
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
 
-    // allow localhost
-    if (origin === 'http://localhost:5173') {
-      return callback(null, true);
-    }
-
-    // allow all vercel domains
-    if (origin.endsWith('.vercel.app')) {
+    if (
+      origin === 'http://localhost:5173' ||
+      origin.endsWith('.vercel.app')
+    ) {
       return callback(null, true);
     }
 
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
-}));
+};
+
+// apply CORS to all routes
+app.use(cors(corsOptions));
+
+// 👇 THIS LINE IS CRITICAL (handles preflight)
+app.options('*', cors(corsOptions));
 
 
 
